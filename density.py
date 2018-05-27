@@ -21,7 +21,7 @@ def searchDense(word, file, parts):
         for k in range(len(body[p])):
             if body[p][k]==word:
                 #print(p,k)
-                ans.append([int(p/gap),p-int(p/gap)*gap])
+                ans.append([int(p/gap),p%gap])
                 #print(int(p/gap),k)
     return ans
             
