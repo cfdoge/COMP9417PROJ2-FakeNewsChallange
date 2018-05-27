@@ -21,9 +21,9 @@ def searchDense(body, word):
     for p in range(len(body)):
         for k in range(len(body[p])):
             if body[p][k]==word:
-                print(p,k)
+                #print(p,k)
                 ans.append([int(p/gap),p-int(p/gap)*gap])
-                print("Andy:",int(p/gap),k)
+                #print(int(p/gap),k)
     return ans
             
             
