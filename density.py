@@ -5,18 +5,17 @@ Created on Sun May 27 15:35:25 2018
 @author: Michael-JamesCoetzee
 """
 
-f = open('densTest.txt','r')
-PARTS=3
-arr= f.readlines()
-gap=int(len(arr)/3)
-ans=[]
-for k in range(len(arr)):
-    ans.append(arr[k].strip().lower().split(" "))
-
-print(ans)
 
 
-def searchDense(body, word):
+def searchDense(word, file, parts):
+    f = open(file,'r')
+    PARTS=3
+    arr= f.readlines()
+    gap=int(len(arr)/parts)
+    body=[]
+    for k in range(len(arr)):
+        body.append(arr[k].strip().lower().split(" "))
+
     ans=[]
     for p in range(len(body)):
         for k in range(len(body[p])):
@@ -27,4 +26,4 @@ def searchDense(body, word):
     return ans
             
             
-print(searchDense(ans,"lady"))
+print(searchDense("lady","densTest.txt",3))
