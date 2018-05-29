@@ -15,7 +15,17 @@ def stem_tokens(tokens, stemmer):
         stemmed.append(stemmer.stem(token))
     return stemmed
 
-print(stem_tokens(["Winnie","the","pooh","cat","mat","premature","obscure","distortion"],english_stemmer))
+
+def removeStop(line,stopwords):
+    #print(re.search('\'',"don't"))
+    arr=[]
+    for k in range (len(line)):
+        print(line[k])
+        if re.search('\'',line[k]):
+            arr.append(line[k])
+        elif line[k] not in stopwords:
+            arr.append(line[k])
+    return arr
 
 def preproc(line,
                     token_pattern=token_pattern,
@@ -31,4 +41,15 @@ def preproc(line,
 
     return tokens_stemmed
 
-print(preproc("whispering windand dont as we wind on down the roadour shadows taller than our soulthere walks a lady we all knowwho shines white light and wants to showhow everything still turns to goldand if you listen very hardthe tune will come to you at ",token_pattern,stopwords,english_stemmer))
+def body_to_sentences(body,stopwords):
+    body=body.replace("?",".")
+    body=body.replace("!",".")
+    arr=body.split(".")
+    while '' in arr: arr.remove('')
+    
+    for k in range(len(arr)):
+        arr[k]=re.sub(r'[^\w\'\s]','',arr[k]).lstrip()
+        arr[k]=' '.join(removeStop(arr[k].split(" "),stopwords))
+    return arr
+
+print(body_to_sentences("whispering windand and don't donrd.the tune will come to you at? here we go, and here.",stopwords))
