@@ -44,7 +44,7 @@ def removeStop(line,stopwords):
             arr.append(line[k])
     return arr
 
-def DensitySearch(word, file, parts):
+def DensitySearch(words, file, parts,weights):
     f=open(file,'r')
     arr=f.readlines()
     #print(arr)
@@ -60,9 +60,7 @@ def DensitySearch(word, file, parts):
     for m in range(parts-1):
         temp=[]
         for k in range(h,h+gap):
-            #print("before",arr[k])
             arr[k] = re.sub(r'[^\w\'\s]','',arr[k])
-            #print("after",arr[k])
             temp.append(removeStop(arr[k].strip().split(),stopwords))
         h=h+gap
         body.append(temp)
@@ -78,8 +76,9 @@ def DensitySearch(word, file, parts):
         count=0
         for k in range(len(body[p])):
             for j in range(len(body[p][k])):
-                if body[p][k][j]==word:
-                    count=count+1
+                for h in range(len(words)):
+                    if body[p][k][j]==words[h]:
+                        count=count+weights[h]
         if count>max:
             max=count
             sect=p
@@ -122,4 +121,4 @@ def searchDense(word, file, parts):
         pos=pos+1
     return answer
             
-print(DensitySearch("lady","densTest.txt",3))
+print(DensitySearch(["lady","head"],"densTest.txt",3,[6,4]))
