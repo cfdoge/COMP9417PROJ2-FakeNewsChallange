@@ -50,4 +50,4 @@ class Tf_Idf_Fea:
         ## 6. Compute the cosine similarity
         simTfidf = pd.Series([ cosine(head_transform.toarray()[i], Body_transform.toarray()[i]) for i in range(len(head_transform.toarray()))])
 
-        return simTfidf
+        return 1-simTfidf

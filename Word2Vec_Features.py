@@ -117,5 +117,5 @@ class Word2Vec_Feature():
     # output: A Series of cosine similarity for each pair
     def cosin_similarity(self, head_w2v, body_w2v):
         simTfidf = pd.Series([cosine(head_w2v[i], body_w2v[i]) for i in range(len(head_w2v))])
-        return simTfidf
+        return 1-simTfidf
 
