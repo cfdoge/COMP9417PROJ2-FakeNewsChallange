@@ -15,13 +15,18 @@ class Tf_Idf_Fea:
     #  input: Both inputs are n-gram processed 2D arrays of stemmed tokens. A[i] = represent a token list of a certain file.
     #  output: cosine similarity in pandas Series form
     def process(trainHead, trainBody ):
-        def merge_head_body(Head, Body):
-            res = '%s %s' % (' '.join(Head), ' '.join(Body))
+        def merge_head_body(Head):
+            res = ' '.join(Head)
             return res
+
         ## 1. merge text body and head into a list, and transform it into a form easy to vectorize
-        text_list = [] # A list of strings, every element is a doc with headline and body.
+        head_list = []  # A list of strings, every element is a doc with headline and body.
         for i in range(len(trainHead)):
-            text_list.append(merge_head_body(trainHead[i], trainBody[i]))
+            head_list.append(merge_head_body(trainHead[i]))
+        body_list = []
+        for j in range(len(trainBody)):
+            body_list.append(merge_head_body(trainBody[j]))
+        text_list = head_list + body_list
 
         ## 2. Using tfidf Vectorizer to get the vocabulary for the whole training corpus
         ## Trian the vocabulary first.
