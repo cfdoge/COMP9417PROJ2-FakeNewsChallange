@@ -19,10 +19,11 @@ def removeStop(line,stopwords):
             arr.append(line[k])
     return arr
 
-def DensitySearch(words, file, parts,weights):
-    f=open(file,'r')
-    arr=f.readlines()
-    #print(arr)
+def DensitySearch(words, body, parts,weights):
+    #f=open(file,'r')
+    body=body.replace("?",".")
+    body=body.replace("!",".")
+    arr=body.split(".")
     for k in range(len(arr)):
         arr[k] = arr[k].strip()
     while '' in arr: arr.remove('')
@@ -68,4 +69,8 @@ def DensitySearch(words, file, parts,weights):
     else:
         return False
 
-print(DensitySearch(["andy"],"densTest.txt",3,[6,4]))
+
+body="There's a lady who's sure all that glitters is gold. And she's buying a stairway to heaven. When she gets there she knows, if the stores are all close With a word she can get what she came"
+
+
+print(DensitySearch(["glitters","gold"],body,3,[6,4]))
