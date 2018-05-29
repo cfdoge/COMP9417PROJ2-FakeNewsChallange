@@ -47,6 +47,7 @@ def DensitySearch(words, file, parts,weights):
     #print(body)
     sect=-1
     max=0
+    found=False
     for p in range(len(body)):
         count=0
         for k in range(len(body[p])):
@@ -57,10 +58,14 @@ def DensitySearch(words, file, parts,weights):
         if count>max:
             max=count
             sect=p
+            found=True
     #print(body[sect])
     ans=[]
-    for p in range(len(body[sect])):
-        ans.append(' '.join(body[sect][p]))
-    return ans
+    if found:
+        for p in range(len(body[sect])):
+            ans.append(' '.join(body[sect][p]))
+        return ans
+    else:
+        return False
 
-print(DensitySearch(["lady","head"],"densTest.txt",3,[6,4]))
+print(DensitySearch(["andy"],"densTest.txt",3,[6,4]))
