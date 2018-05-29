@@ -28,7 +28,8 @@ class Tf_Idf_Fea:
         tfidf_vec = TfidfVectorizer(ngram_range=(1, 3), max_df=0.8, min_df=2)
         tfidf_vec.fit(text_list)  # Tf-idf calculated on the combined training + test set
         vocabulary = tfidf_vec.vocabulary_
-
+        with open('vocabulary_tfidf', "wb") as vocabfile: ## 5.29 Updated: We need the vocabulary for the whole transformation latter
+            pickle.dump(vocabulary, vocabfile, -1)
         ## 3.Fit the headline into the same vocabulary
         vecH = TfidfVectorizer(ngram_range=(1, 3), max_df=0.8, min_df=2, vocabulary=vocabulary)
         head_str_list = [ ' '.join(h) for h in trainHead]
