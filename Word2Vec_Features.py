@@ -69,10 +69,10 @@ class Word2Vec_Feature():
 
         ## Calculate the weighted w2v vector
         head_w2v = []
-        head_tfidf_array = head_tfidf.toarray()
+        head_tfidf_array = head_tfidf
         for i in range(len(trainHead)):
             head_mat = np.zeros(300, )
-            tf_idf_vec = head_tfidf_array[i]
+            tf_idf_vec = head_tfidf_array[i].toarray()[0]
             for word in trainHead[i]:
                 try:
                     index = vocabulary[word]

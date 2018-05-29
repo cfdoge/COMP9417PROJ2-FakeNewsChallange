@@ -20,7 +20,7 @@ def removeStop(line,stopwords):
     #print(re.search('\'',"don't"))
     arr=[]
     for k in range (len(line)):
-        print(line[k])
+        #print(line[k])
         if re.search('\'',line[k]):
             arr.append(line[k])
         elif line[k] not in stopwords:

@@ -34,12 +34,12 @@ class Sentiment_Feature:
         headline_mark = []
         headline_keyword = []
         counter = 0
-        headline_tfidf_vec = head_tfidf.toarray()
+        headline_tfidf_vec = head_tfidf
         for headline in trainHead:
             temp =[]
             for word in headline:
                 index = vocabulary[word]
-                temp.append((headline_tfidf_vec[counter][index],word))
+                temp.append((headline_tfidf_vec[counter].toarry()[0][index],word))
             temp.sort(reverse=True)
             polarity = sia.polarity_scores(' '.join(headline))
             headline_mark.append(polarity['compound'])
