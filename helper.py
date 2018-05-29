@@ -31,4 +31,4 @@ def preproc(line,
 
     return tokens_stemmed
 
-print(preproc("Winnie the pooh cat mat premature obscure distortion",token_pattern,stopwords,english_stemmer))
+print(preproc("whispering windand dont as we wind on down the roadour shadows taller than our soulthere walks a lady we all knowwho shines white light and wants to showhow everything still turns to goldand if you listen very hardthe tune will come to you at ",token_pattern,stopwords,english_stemmer))
