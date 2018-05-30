@@ -9,8 +9,9 @@ import re, math
 
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
+#remove stop words
 def removeStop(line,stopwords):
-    #print(re.search('\'',"don't"))
+    
     arr=[]
     for k in range (len(line)):
         if re.search('\'',line[k]):
@@ -20,19 +21,21 @@ def removeStop(line,stopwords):
     return arr
 
 def DensitySearch(words, body, parts,weights):
-    #f=open(file,'r')
     body=body.replace("?",".")
     body=body.replace("!",".")
     arr=body.split(".")
     for k in range(len(arr)):
         arr[k] = arr[k].strip()
     while '' in arr: arr.remove('')
-    #print(arr)
+    
+    # size of each part
     gap=math.floor(len(arr)/parts)
-    #print(len(arr))
-    #print(gap*parts)
+    
+    
     h=0
     body=[]
+    
+    #create body parts with punctuation and stopwords removed
     for m in range(parts-1):
         temp=[]
         for k in range(h,h+gap):
@@ -41,16 +44,20 @@ def DensitySearch(words, body, parts,weights):
         h=h+gap
         body.append(temp)
     temp2=[]
+    
+    #last part maybe a few lines longer if parts doesnt divide len(arr)
     for b in range(h,len(arr)):
         arr[b] = re.sub(r'[^\w\'\s]','',arr[b])
         temp2.append(removeStop(arr[b].strip().split(),stopwords))
     body.append(temp2)
-    #print(body)
+    
     sect=-1
     max=0
     found=False
+    
+    #find body part with maximum weighted sum
     for p in range(len(body)):
-        count=0
+        count=0# set weighted sum to 0 for each new body part
         for k in range(len(body[p])):
             for j in range(len(body[p][k])):
                 for h in range(len(words)):
@@ -60,7 +67,7 @@ def DensitySearch(words, body, parts,weights):
             max=count
             sect=p
             found=True
-    #print(body[sect])
+    
     ans=[]
     if found:
         for p in range(len(body[sect])):
