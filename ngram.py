@@ -5,6 +5,7 @@ import nltk
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
 
+#remove stopwords
 def removeStop(line):
     #print(re.search('\'',"don't"))
     arr=[]
@@ -16,6 +17,7 @@ def removeStop(line):
             arr.append(line[k])
     return arr
 
+#remove punctuation etc
 def Handle(words):
     ans =re.split("[ ,.;?!:\"]",words)
     p=0
@@ -41,21 +43,25 @@ def preproc(line,
 
     return tokens_stemmed
 
+#calculate unigrams
 def Unigram(words):
     return words
 
+#calculate bigrams
 def Bigram(words):
     ans=[]
     for k in range(len(words)-1):
         ans.append(words[k]+"_"+words[k+1])
     return ans
 
+#calculate try grams
 def Trigram(words):
     ans=[]
     for k in range(len(words)-2):
         ans.append(words[k]+"_"+words[k+1]+"_"+words[k+2])
     return ans
 
+#get gram of specified type for both body and main as well as size of both sets
 def getGrams(title, main, type):
     if type==1:
         return(Unigram(Handle(title)),Unigram(Handle(main)), len(set(Unigram(Handle(title)))),len(set(Unigram(Handle(main)))))

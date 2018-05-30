@@ -16,6 +16,7 @@ def stem_tokens(tokens, stemmer):
     return stemmed
 
 
+#remove stop words
 def removeStop(line):
     #print(re.search('\'',"don't"))
     arr=[]
