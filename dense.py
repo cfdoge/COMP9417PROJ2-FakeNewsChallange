@@ -45,7 +45,7 @@ def DensitySearch(words, body, parts,weights):
         body.append(temp)
     temp2=[]
     
-    #last part maybe a few lines longer if parts doesnt divide len(arr)
+    #last part maybe a few lines longer if parts doesn't divide len(arr)
     for b in range(h,len(arr)):
         arr[b] = re.sub(r'[^\w\'\s]','',arr[b])
         temp2.append(removeStop(arr[b].strip().split(),stopwords))
@@ -62,6 +62,7 @@ def DensitySearch(words, body, parts,weights):
             for j in range(len(body[p][k])):
                 for h in range(len(words)):
                     if body[p][k][j]==words[h]:
+                        #if word found add corresponding weight to count
                         count=count+weights[h]
         if count>max:
             max=count
