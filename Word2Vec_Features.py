@@ -47,10 +47,29 @@ class Word2Vec_Feature():
 
         return head_w2v,body_w2v
 
+    def topk_tfidf(self,body, tfidf, vocabulary):
+        vec = []
+        # print(tfidf)
+        bag = set(body)
+        for word in bag:
+            # print(word)
+            try:
+                index = vocabulary[word.lower()]
+                # print('wtf')
+                vec.append((tfidf.toarray()[0][index], word))
+            except:
+                # print('w')
+
+                vec.append((0, word))
+        vec.sort(reverse=True)
+        output = []
+        return vec[:10]
+
     ## vectorize and transform to w2v format, weighted by tf_idf value
     #  input: Both inputs are n-gram processed 2D arrays of stemmed tokens. A[i] = represent a token list of a certain file.
     #  output: return 2 list, the first one is headlines vector in w2v form and the second is body vector in w2v form
     #  Both vectors now are weighted by tf_idf value.
+
     def weighted_transform(self, trainHead, trainBody):
         model = self.model
 
@@ -75,7 +94,7 @@ class Word2Vec_Feature():
             tf_idf_vec = head_tfidf_array[i].toarray()[0]
             for word in trainHead[i]:
                 try:
-                    index = vocabulary[word]
+                    index = vocabulary[word.lower()]
                     head_mat += model[word]*tf_idf_vec[index]
                 except:
                     continue
@@ -84,14 +103,15 @@ class Word2Vec_Feature():
             # head_w2v.append([model[word] for word in trainHead[i] if word in model])
 
         body_w2v = []
-        body_tfidf_array = body_tfidf.toarray()
+        body_tfidf_array = body_tfidf
         for j in range(len(trainBody)):
             body_mat = np.zeros(300, )
             tf_idf_vec2 = body_tfidf_array[j]
-            for word2 in trainBody[j]:
+            topk_vec = self.topk_tfidf(trainBody[j], body_tfidf_array[j], vocabulary)
+            # print(topk_vec)
+            for val2, word2 in topk_vec:
                 try:
-                    index2 = vocabulary[word2]
-                    body_mat += model[word2]*tf_idf_vec2[index2]
+                    body_mat += model[word2] * val2
                 except:
                     continue
             body_w2v.append(body_mat)
@@ -115,7 +135,14 @@ class Word2Vec_Feature():
     # input:  head_w2v: a list of headlines represented in w2v form.
     #         body_w2v: a list of body text represented in w2v form.
     # output: A Series of cosine similarity for each pair
-    def cosin_similarity(self, head_w2v, body_w2v):
-        simTfidf = pd.Series([cosine(head_w2v[i], body_w2v[i]) for i in range(len(head_w2v))])
-        return 1-simTfidf
+    def cosin_similarity(self,head_w2v, body_w2v):
+        with open('body_id_reference', 'rb') as infile:
+            ref_id = pickle.load(infile)
+        # print(ref_id)
+        simTfidf = pd.Series([cosine(head_w2v[i], body_w2v[ref_id[i]]) for i in range(len(ref_id))])
+        with open('w2v_sim', 'wb') as file:
+            pickle.dump(1-simTfidf, file, -1)
+
+        return 1 - simTfidf
+
 

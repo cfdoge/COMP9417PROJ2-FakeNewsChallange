@@ -6,7 +6,7 @@ Created on Tue May 29 16:55:57 2018
 """
 
 import re, math
-
+import nltk
 stopwords = set(nltk.corpus.stopwords.words('english'))
 
 #remove stop words

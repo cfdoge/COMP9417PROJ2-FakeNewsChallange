@@ -14,7 +14,7 @@ class Tf_Idf_Fea:
     ## vectorize and processing training text
     #  input: Both inputs are n-gram processed 2D arrays of stemmed tokens. A[i] = represent a token list of a certain file.
     #  output: cosine similarity in pandas Series form
-    def process(trainHead, trainBody ):
+    def process(self,trainHead, trainBody ):
         def merge_head_body(Head):
             res = ' '.join(Head)
             return res

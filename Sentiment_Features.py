@@ -5,6 +5,7 @@ import pickle
 from scipy.spatial.distance import cosine
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from dense import removeStop, DensitySearch
+from helper import body_to_sentences
 
 class Sentiment_Feature:
     def __init__(self,stopword, pieces = 3):
@@ -30,6 +31,8 @@ class Sentiment_Feature:
         filename_vocab = 'vocabulary_tfidf'
         with open(filename_vocab, "rb") as infile3:
             vocabulary = pickle.load(infile3)
+        with open('body_id_reference', 'rb') as infile:
+            ref_id = pickle.load(infile)
 
         headline_mark = []
         headline_keyword = []
@@ -48,7 +51,10 @@ class Sentiment_Feature:
         body_mark_ave = []
         for doc in trainBody_sentences:
             body_mark = []
+            # print(doc)
+            doc = body_to_sentences(doc) # stopwords check
             for sentence in doc:
+                # print(sentence)
                 polarity2 = sia.polarity_scores(sentence)
                 body_mark.append(polarity2['compound'])
             body_mark_ave.append(np.average(body_mark))
