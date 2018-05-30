@@ -1,108 +1,57 @@
-import numpy as np
-import pandas as pd
-import pickle as pkl
+from sklearn.decomposition import TruncatedSVD
 from scipy import linalg
+import numpy as np
 from scipy.spatial.distance import cosine
-
-class Deserializer:
-    def __init__(self, headlines, bodies):
-        ''' Deserialize the TF-IDF data '''
-        self.head_collection = self.deserialize_data(headlines)
-        self.body_collection = self.deserialize_data(bodies)
-        self.data = self.merge_data()
-
-    def deserialize_data(self, filename):
-        with open(filename, "rb") as f:
-            data = pkl.load(f)
-        return data.toarray()
-
-    def merge_data(self):
-        head_toMatrix = np.matrix(self.head_collection)
-        body_toMatrix = np.matrix(self.body_collection)
-        return np.concatenate((head_toMatrix, body_toMatrix))
-
-class LSA:
-    def __init__(self):
-        self.inverse_sigma = None
-        self.transpose_U = None
-
-    def decomposition(self, term_document_matrix, num_topics):
-        ''' Given a term-document matrix represented in a vector feature-space,
-            decompose the matrix into a new latent-topic feature space '''
-
-        # DEBUG: print out the original term_document_matrix for comparison
-        # print(term_document_matrix, end="\n\n")
-
-        # decompose the term document matrix
-        U, Sigma, Vh = linalg.svd(term_document_matrix)
-        # extract dimensions
-        num_terms, num_docs = term_document_matrix.shape
-        # compute the diagonal singular value matrix
-        SigmaDiag = linalg.diagsvd(Sigma, num_terms, num_docs)
-
-        # DEBUG: confirm that the matrix product of U•Sigma•Vh results in a
-        #        close approximation of the original term_document_matrix.
-        # matrix_recomposition = U.dot(SigmaDiag.dot(Vh))
-        # print(matrix_recomposition, end="\n\n")
-
-        # num_topics must be <= num_docs
-        if num_topics > num_docs:
-            return False
-        # trim excess latent topics
-        new_U = U[:,:num_topics]    # trims term-to-topic matrix
-        new_Vh = Vh[:num_topics,:]  # trims document-to-topic matrix
-        new_SigmaDiag = SigmaDiag[:num_topics,:num_topics] # trims to a square matrix
-
-        # DEBUG: confirm that the matrix product of new_U•Sigma•Vh results in a
-        #        decent approximation of the original term_document_matrix, but not
-        #        as accurate as U•Sigma•Vh, as there are fewer latent topics.
-        # new_matrix_recomposition = new_U.dot(new_SigmaDiag.dot(new_Vh))
-        # print(new_matrix_recomposition, end="\n\n")
-
-        # store the matrix components necessary to convert a vector (e.g. TF-IDF)
-        # in the original feature space to a vector in the latent topic feature space:
-        #    • the inverse of the diagonal singular value matrix, new_Sigma; and
-        #    • the transpose of the term-to-topic matrix, new_U
-        self.inverse_sigma = linalg.inv(new_SigmaDiag)
-        self.transpose_U = new_U.transpose()
-
-    def transform(self, documents):
-        ''' Transforms all documents in the old feature space into LSA feature space '''
-        return [ self.project_onto_latent_featurespace(document) for document in documents ]
-
-    def project_onto_latent_featurespace(self, document):
-        ''' Given a document represented in the old vector format (eg. TF-IDF),
-            derive its vector format in the new latent-topic feture space. The
-            project formula is defined as:
-
-                    d-hat = inverse(Sig) • transpose(U) • d
-
-            where d-hat is the new vector and d is the old vector '''
-        new_document = self.inverse_sigma.dot(self.transpose_U.dot(document))
-        return new_document
+import pickle as pkl
+import pandas as pd
 
 
-if __name__ == "__main__":
+# 1. Extract combined TF-IDFs of headlines and bodies
+with open("comb_tfidf_transform", "rb") as f:
+    heads_and_bodies_tfidf = pkl.load(f)
+with open("head_tfidf_transform", "rb") as f:
+    head_tfidf_vectors = pkl.load(f)
+with open("body_tfidf_transform", "rb") as f:
+    body_tfidf_vectors = pkl.load(f)
 
-    ######## EXAMPLE USAGE ########
+# 2. Extract the stances data
+head_df = pd.read_csv("train_stances.csv")
+body_df = pd.read_csv("train_bodies.csv")
 
-    # 1. initialise deserializer to extract the TF-IDF feature data
-    deserializer = Deserializer(headlines="head_tfidf_transform", bodies="body_tfidf_transform")
+old_body_IDs = head_df["Body ID"].tolist()
+all_body_IDs = body_df["Body ID"].tolist()
+new_body_IDs = range(len(all_body_IDs))
 
-    # 2. transpose the document-term matrix to get the term-document matrix
-    term_document_matrix = deserializer.data.transpose()
+# 3. Create a mapping from old body ids to new body ids
+body_id_mapper = dict(zip(all_body_IDs, new_body_IDs))
+new_ID_list = [ body_id_mapper[old_id] for old_id in old_body_IDs ]
 
-    # 3. instantiate the LSA object and decompose the term-document matrix
-    lsa = LSA()
-    lsa.decomposition(term_document_matrix, num_topics=3)
+# 4. Fit the TF-IDF matrix to the SVD model
+n_latent_topics = 50
 
-    # 4. transform the headline and body texts separately
-    new_head = lsa.transform(deserializer.head_collection)
-    new_body = lsa.transform(deserializer.body_collection)
+svd = TruncatedSVD(n_components=n_latent_topics, n_iter=15)
+svd.fit(heads_and_bodies_tfidf)
 
-    # 5. compute the cosine similarity,  (1 - distance), for each headline-body pair
-    simSVD = pd.Series([ (1 - cosine(new_head[i], new_body[i])) for i in range(len(new_head)) ])
+# 5. Extract the U and Sigma-inverse from the SVD
+U = svd.components_
+Sigma = linalg.diagsvd(svd.singular_values_, n_latent_topics, n_latent_topics)
 
-    # 6. write the SVD similarity data out to file
-    with open("svd_similarity.pkl", "wb") as f:
-        pkl.dump(simSVD, f, -1)
+# 6. Transform the TF-IDF vectors for corresponding headline and body texts
+#    into the new (latent) feature space
+svd_transform = svd.transform(heads_and_bodies_tfidf)
+
+# 7. Separate svd_transform into transformed headline and boy texts
+svd_headlines = svd_transform[:49972]
+svd_bodies = svd_transform[49972:]
+
+# 8. Calculate Cosine similarity between headlines and their corresponding body texts
+svd_similarities = []
+for head, body in enumerate(new_ID_list):
+    head_svd_vector = svd_headlines[head]
+    body_svd_vector = svd_bodies[body]
+    cosine_sim = (1 - cosine(head_svd_vector, body_svd_vector))
+    svd_similarities.append(cosine_sim)
+
+# 9. Write the SVD cosine similarity list to file as a pd.Series
+'''with open("svd_cosine_similarity", "wb") as f:
+    pkl.dump(pd.Series(svd_similarities), f, -1)'''

@@ -1,6 +1,23 @@
 import re
 import nltk
 
+
+stopwords = set(nltk.corpus.stopwords.words('english'))
+
+
+#remove stopwords
+def removeStop(line):
+    #print(re.search('\'',"don't"))
+    arr=[]
+    for k in range (len(line)):
+        #print(line[k])
+        if re.search('\'',line[k]):
+            arr.append(line[k])
+        elif line[k] not in stopwords:
+            arr.append(line[k])
+    return arr
+
+#remove punctuation etc
 def Handle(words):
     ans =re.split("[ ,.;?!:\"]",words)
     p=0
@@ -8,23 +25,43 @@ def Handle(words):
         if ans[p]=="":
             ans.pop(p)
         p=p+1
-    return ans
+    
+    
+    return removeStop(ans)
 
+def preproc(line,
+                    token_pattern=token_pattern,
+                    exclude_stopword=True,
+                    stem=True):
+    token_pattern = re.compile(token_pattern)
+    tokens = [x.lower() for x in token_pattern.findall(line)]
+    tokens_stemmed = tokens
+    if stem:
+        tokens_stemmed = stem_tokens(tokens, english_stemmer)
+    if exclude_stopword:
+        tokens_stemmed = [x for x in tokens_stemmed if x not in stopwords]
+
+    return tokens_stemmed
+
+#calculate unigrams
 def Unigram(words):
     return words
 
+#calculate bigrams
 def Bigram(words):
     ans=[]
     for k in range(len(words)-1):
         ans.append(words[k]+"_"+words[k+1])
     return ans
 
+#calculate try grams
 def Trigram(words):
     ans=[]
     for k in range(len(words)-2):
         ans.append(words[k]+"_"+words[k+1]+"_"+words[k+2])
     return ans
 
+#get gram of specified type for both body and main as well as size of both sets
 def getGrams(title, main, type):
     if type==1:
         return(Unigram(Handle(title)),Unigram(Handle(main)), len(set(Unigram(Handle(title)))),len(set(Unigram(Handle(main)))))
@@ -34,4 +71,4 @@ def getGrams(title, main, type):
         return (Trigram(Handle(title)), Trigram(Handle(main)), len(set(Trigram(Handle(title)))),len(set(Trigram(Handle(main)))))
     return([],[],0)
 
-print(getGrams("Winnie the pooh the pooh", "pooh was angry with tiger, and piglet didn't like it",1))
+print(getGrams("Winnie the pooh? the pooh", "pooh was angry with tiger, and piglet didn't like it",2))

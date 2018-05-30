@@ -57,7 +57,29 @@ class Tf_Idf_Fea:
         with open('comb_tfidf_transform', "wb") as combfile:
             pickle.dump(combined_transform, combfile, -1)
 
-        ## 6. Compute the cosine similarity
+        '''## 6. Compute the cosine similarity
         simTfidf = pd.Series([ cosine(head_transform.toarray()[i], Body_transform.toarray()[i]) for i in range(len(head_transform.toarray()))])
 
-        return 1-simTfidf
+        return 1-simTfidf'''
+
+        # Extract the stances data
+        head_df = pd.read_csv("train_stances.csv")
+        body_df = pd.read_csv("train_bodies.csv")
+
+        old_body_IDs = head_df["Body ID"].tolist()
+        all_body_IDs = body_df["Body ID"].tolist()
+        new_body_IDs = range(len(all_body_IDs))
+
+        # Create a mapping from old body ids to new body ids
+        body_id_mapper = dict(zip(all_body_IDs, new_body_IDs))
+        new_ID_list = [ body_id_mapper[old_id] for old_id in old_body_IDs ]
+
+        # Compute the cosine similarity
+        tfidf_similarities = []
+        for head, body in enumerate(new_ID_list):
+            head_svd_vector = head_transform[head].toarray()[0]
+            body_svd_vector = Body_transform[body].toarray()[0]
+            cosine_sim = 1 - cosine(head_svd_vector, body_svd_vector)
+            tfidf_similarities.append(cosine_sim)
+
+        return pd.Series(tfidf_similarities)

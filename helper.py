@@ -16,7 +16,8 @@ def stem_tokens(tokens, stemmer):
     return stemmed
 
 
-def removeStop(line,stopwords):
+#remove stop words
+def removeStop(line):
     #print(re.search('\'',"don't"))
     arr=[]
     for k in range (len(line)):
@@ -41,7 +42,7 @@ def preproc(line,
 
     return tokens_stemmed
 
-def body_to_sentences(body,stopwords):
+def body_to_sentences(body):
     body=body.replace("?",".")
     body=body.replace("!",".")
     arr=body.split(".")
@@ -49,7 +50,7 @@ def body_to_sentences(body,stopwords):
     
     for k in range(len(arr)):
         arr[k]=re.sub(r'[^\w\'\s]','',arr[k]).lstrip()
-        arr[k]=' '.join(removeStop(arr[k].split(" "),stopwords))
+        arr[k]=' '.join(removeStop(arr[k].split(" ")))
     return arr
 
-print(body_to_sentences("whispering windand and don't donrd.the tune will come to you at? here we go, and here.",stopwords))
+print(body_to_sentences("whispering windand and don't donrd.the tune will come to you at? here we go, and here."))
