@@ -8,9 +8,9 @@ from sklearn.preprocessing import normalize
 class Word2Vec_Feature():
     def __init__(self, model_name='default'):
         if model_name == 'default':
-            self.model = gensim.models.Word2Vec.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+            self.model = gensim.models.KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
         else:
-            self.model = gensim.models.Word2Vec.load_word2vec_format(model_name, binary=True)
+            self.model = gensim.models.KeyedVectors.load_word2vec_format(model_name, binary=True)
 
     ## vectorize and transform to w2v format
     #  input: Both inputs are n-gram processed 2D arrays of stemmed tokens. A[i] = represent a token list of a certain file.

@@ -46,11 +46,16 @@ class Tf_Idf_Fea:
         Body_str_list = [' '.join(h) for h in trainBody]
         Body_transform = vecB.fit_transform(Body_str_list)
 
+        vec_comb = TfidfVectorizer(ngram_range=(1, 3), max_df=0.8, min_df=2, vocabulary=vocabulary)
+        combined_transform = vec_comb.fit_transform(text_list)
+
         ## 5. Save two pickle for head_transform and Body_transform matrices at current directory
         with open('head_tfidf_transform', "wb") as headfile:
             pickle.dump(head_transform, headfile, -1)
         with open('body_tfidf_transform', "wb") as bodyfile:
             pickle.dump(Body_transform, bodyfile, -1)
+        with open('comb_tfidf_transform', "wb") as combfile:
+            pickle.dump(combined_transform, combfile, -1)
 
         ## 6. Compute the cosine similarity
         simTfidf = pd.Series([ cosine(head_transform.toarray()[i], Body_transform.toarray()[i]) for i in range(len(head_transform.toarray()))])
