@@ -53,5 +53,5 @@ for head, body in enumerate(new_ID_list):
     svd_similarities.append(cosine_sim)
 
 # 9. Write the SVD cosine similarity list to file as a pd.Series
-'''with open("svd_cosine_similarity", "wb") as f:
-    pkl.dump(pd.Series(svd_similarities), f, -1)'''
+with open("svd_cosine_similarity", "wb") as f:
+    pkl.dump(pd.Series(svd_similarities), f, -1)
